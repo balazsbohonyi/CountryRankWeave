@@ -1,0 +1,85 @@
+import { RankingDataset } from "../types";
+
+export const giniDataset: RankingDataset = {
+  meta: {
+    title: "Income Inequality by Country",
+    subtitle: "Top 60 countries by Gini index (inequality comparison between 2014 and 2024). Higher index indicates greater inequality.",
+    metric: "Gini Index",
+    unit: "index points",
+    periods: [
+      { id: "2014", label: "2014 Gini" },
+      { id: "2024", label: "2024 Gini" }
+    ],
+    topN: 60,
+    sortDirection: "desc", // higher Gini = higher rank in this list
+    missingPolicy: "show-faded",
+    ribbonMode: "constant",
+    sourceNote: "World Bank Poverty and Inequality Database",
+    datasetId: "gini-index",
+    datasetLabel: "Income Inequality (Gini)"
+  },
+  countries: [
+    { id: "zaf", name: "South Africa", code: "ZA", values: { "2014": 63.0, "2024": 63.8 } },
+    { id: "nam", name: "Namibia", code: "NA", values: { "2014": 59.1, "2024": 58.0 } },
+    { id: "sur", name: "Suriname", code: "SR", values: { "2014": 57.6, "2024": 57.9 } },
+    { id: "zmb", name: "Zambia", code: "ZM", values: { "2014": 57.1, "2024": 55.9 } },
+    { id: "caf", name: "Central African Republic", code: "CF", values: { "2014": 56.2, "2024": 54.5 } },
+    { id: "lso", name: "Lesotho", code: "LS", values: { "2014": 54.9, "2024": 54.0 } },
+    { id: "moz", name: "Mozambique", code: "MZ", values: { "2014": 54.0, "2024": 52.5 } },
+    { id: "bwa", name: "Botswana", code: "BW", values: { "2014": 53.3, "2024": 52.5 } },
+    { id: "bra", name: "Brazil", code: "BR", values: { "2014": 52.0, "2024": 50.5 } },
+    { id: "col", name: "Colombia", code: "CO", values: { "2014": 51.5, "2024": 53.0 } },
+    { id: "swz", name: "Eswatini", code: "SZ", values: { "2014": 51.5, "2024": 53.2 } },
+    { id: "ago", name: "Angola", code: "AO", values: { "2014": 51.3, "2024": 52.0 } },
+    { id: "pan", name: "Panama", code: "PA", values: { "2014": 50.1, "2024": 48.9 } },
+    { id: "hnd", name: "Honduras", code: "HN", values: { "2014": 49.8, "2024": 48.2 } },
+    { id: "cri", name: "Costa Rica", code: "CR", values: { "2014": 48.5, "2024": 47.2 } },
+    { id: "gtm", name: "Guatemala", code: "GT", values: { "2014": 48.3, "2024": 49.0 } },
+    { id: "ven", name: "Venezuela", code: "VE", values: { "2014": 48.0, "2024": null } }, // Exited (2014 only)
+    { id: "chl", name: "Chile", code: "CL", values: { "2014": 46.5, "2024": 44.9 } },
+    { id: "pry", name: "Paraguay", code: "PY", values: { "2014": 46.2, "2024": 44.5 } },
+    { id: "mex", name: "Mexico", code: "MX", values: { "2014": 45.8, "2024": 43.7 } },
+    { id: "ecu", name: "Ecuador", code: "EC", values: { "2014": 45.4, "2024": 44.2 } },
+    { id: "bol", name: "Bolivia", code: "BO", values: { "2014": 44.6, "2024": 43.0 } },
+    { id: "per", name: "Peru", code: "PE", values: { "2014": 43.8, "2024": 41.5 } },
+    { id: "arg", name: "Argentina", code: "AR", values: { "2014": 41.7, "2024": 42.9 } },
+    { id: "usa", name: "United States", code: "US", values: { "2014": 41.5, "2024": 42.1 } },
+    { id: "phl", name: "Philippines", code: "PH", values: { "2014": 41.5, "2024": 40.2 } },
+    { id: "tur", name: "Turkey", code: "TR", values: { "2014": 41.2, "2024": 42.5 } },
+    { id: "mys", name: "Malaysia", code: "MY", values: { "2014": 41.0, "2024": 39.5 } },
+    { id: "ury", name: "Uruguay", code: "UY", values: { "2014": 39.7, "2024": 38.5 } },
+    { id: "idn", name: "Indonesia", code: "ID", values: { "2014": 38.8, "2024": 37.9 } },
+    { id: "cub", name: "Cuba", code: "CU", values: { "2014": 38.0, "2024": null } }, // Exited (2014 only)
+    { id: "rus", name: "Russia", code: "RU", values: { "2014": 37.7, "2024": 36.0 } },
+    { id: "kwt", name: "Kuwait", code: "KW", values: { "2014": null, "2024": 37.5 } }, // Entered (2024 only)
+    { id: "tha", name: "Thailand", code: "TH", values: { "2014": 37.0, "2024": 35.5 } },
+    { id: "vnm", name: "Vietnam", code: "VN", values: { "2014": 35.6, "2024": 36.1 } },
+    { id: "ind", name: "India", code: "IN", values: { "2014": 35.4, "2024": 34.2 } },
+    { id: "gbr", name: "United Kingdom", code: "GB", values: { "2014": 34.0, "2024": 35.1 } },
+    { id: "prt", name: "Portugal", code: "PT", values: { "2014": 34.0, "2024": 32.0 } },
+    { id: "can", name: "Canada", code: "CA", values: { "2014": 33.3, "2024": 32.5 } },
+    { id: "grc", name: "Greece", code: "GR", values: { "2014": 33.0, "2024": 31.4 } },
+    { id: "aus", name: "Australia", code: "AU", values: { "2014": 32.5, "2024": 33.2 } },
+    { id: "ita", name: "Italy", code: "IT", values: { "2014": 32.4, "2024": 31.8 } },
+    { id: "twn", name: "Taiwan", code: "TW", values: { "2014": null, "2024": 32.0 } }, // Entered (2024 only)
+    { id: "jpn", name: "Japan", code: "JP", values: { "2014": 31.9, "2024": 32.2 } },
+    { id: "kor", name: "South Korea", code: "KR", values: { "2014": 31.6, "2024": 30.9 } },
+    { id: "pol", name: "Poland", code: "PL", values: { "2014": 30.8, "2024": 28.5 } },
+    { id: "deu", name: "Germany", code: "DE", values: { "2014": 30.5, "2024": 31.7 } },
+    { id: "fra", name: "France", code: "FR", values: { "2014": 29.5, "2024": 29.8 } },
+    { id: "che", name: "Switzerland", code: "CH", values: { "2014": 29.5, "2024": 30.1 } },
+    { id: "irl", name: "Ireland", code: "IE", values: { "2014": 29.8, "2024": 27.2 } },
+    { id: "aut", name: "Austria", code: "AT", values: { "2014": 27.4, "2024": 28.1 } },
+    { id: "swe", name: "Sweden", code: "SE", values: { "2014": 27.2, "2024": 28.0 } },
+    { id: "blr", name: "Belarus", code: "BY", values: { "2014": 27.2, "2024": 24.4 } },
+    { id: "nld", name: "Netherlands", code: "NL", values: { "2014": 26.2, "2024": 27.5 } },
+    { id: "bel", name: "Belgium", code: "BE", values: { "2014": 25.9, "2024": 26.6 } },
+    { id: "dnk", name: "Denmark", code: "DK", values: { "2014": 25.6, "2024": 26.8 } },
+    { id: "ukr", name: "Ukraine", code: "UA", values: { "2014": 24.0, "2024": 25.5 } },
+    { id: "fin", name: "Finland", code: "FI", values: { "2014": 25.1, "2024": 26.1 } },
+    { id: "cze", name: "Czechia", code: "CZ", values: { "2014": 25.1, "2024": 24.8 } },
+    { id: "nor", name: "Norway", code: "NO", values: { "2014": 25.0, "2024": 26.2 } },
+    { id: "svk", name: "Slovakia", code: "SK", values: { "2014": 24.2, "2024": 23.2 } },
+    { id: "slovenia", name: "Slovenia", code: "SI", values: { "2014": 23.7, "2024": 23.0 } }
+  ]
+};
