@@ -6,6 +6,10 @@
 
 Each visualization is built around a bold **alluvial slope chart**: two ranked columns connected by colored ribbons that reveal how positions shift between a start period and an end period. The color of every ribbon encodes the country's final standing, so you can spot winners, losers, and steady performers at a glance.
 
+<div class="center">
+  <img src="./docs/images/demo.gif" alt="Countries with the best reputations in 2025" />
+</div>
+
 ---
 
 ## What It Renders
