@@ -10,8 +10,6 @@ Each visualization is built around a bold **alluvial slope chart**: two ranked c
   <img src="./docs/images/demo.gif" alt="Countries with the best reputations in 2025" />
 </div>
 
----
-
 ## What It Renders
 
 The app produces full-screen, editorial-style infographics with:
@@ -23,8 +21,6 @@ The app produces full-screen, editorial-style infographics with:
 - A **spotlight footer** that appears when you select a country, showing its exact values and rank movement.
 - A **searchable country finder** in the chart header.
 - A **slide-out customization panel** to change datasets, periods, top-N filtering, and missing-data policy.
-
----
 
 ## Datasets Included
 
@@ -39,8 +35,6 @@ The same flexible data structure powers every chart. The app ships with four dat
 
 Adding more datasets is intentionally straightforward — the engine is data-driven and the schema is documented in `docs/dataset-prompt.md` and inside `src/App.tsx`.
 
----
-
 ## Interactive Features
 
 - **Switch datasets** from the slide-out sidebar to explore different global metrics.
@@ -51,8 +45,6 @@ Adding more datasets is intentionally straightforward — the engine is data-dri
 - **Control missing data**: show faded entries for countries that enter or exit the ranking, or hide them entirely.
 - **Export** the active dataset as JSON directly from the sidebar.
 
----
-
 ## Tech Stack
 
 - **React 19** + **TypeScript**
@@ -61,8 +53,6 @@ Adding more datasets is intentionally straightforward — the engine is data-dri
 - **Lucide React** for iconography
 - **FlagCDN** for dynamic flag images
 - Pure SVG math for the ribbon geometry (no charting library)
-
----
 
 ## Run Locally
 
@@ -86,14 +76,10 @@ Other useful scripts:
 - `npm run preview` — preview the production build
 - `npm run lint` — TypeScript type check
 
----
-
 ## Credits
 
 - Original chart concept and data source: [Visual Capitalist / Reputation Lab](https://www.visualcapitalist.com/ranked-countries-with-the-best-reputations-in-2025/)
 - Dataset research prompt and schema: `docs/dataset-prompt.md`
-
----
 
 ## License
 
