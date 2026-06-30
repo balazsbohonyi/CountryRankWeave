@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { Analytics } from "@vercel/analytics/react"
 import { useState, useEffect } from "react";
 import { reputationDataset } from "./data/reputation";
 import { giniDataset } from "./data/gini";
@@ -97,6 +98,8 @@ export default function App() {
         {/* Signature Footer */}
         <Footer dataset={dataset} topN={topN} periodBId={periodBId} />
       </div>
+
+      <Analytics/>
     </div>
   );
 }
