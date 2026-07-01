@@ -38,6 +38,7 @@ export default function Infographic({
   const [failedFlags, setFailedFlags] = useState<Set<string>>(new Set());
   const [searchTerm, setSearchTerm] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
 
   // Reset failed flags when the dataset changes
   useEffect(() => {
@@ -195,6 +196,10 @@ export default function Infographic({
 
   searchableCountries.sort((a, b) => a.name.localeCompare(b.name));
 
+  const filteredSuggestions = searchableCountries.filter((row) =>
+    row.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   const totalRows = Math.max(renderedListA.length, renderedListB.length);
   const rowHeight = 44; // taller rows for solid design
   const svgHeight = totalRows * rowHeight;
@@ -289,7 +294,7 @@ export default function Infographic({
       {/* Shared Header row containing Period titles to align beautifully with lists below */}
       <div className="flex w-full select-none mb-4">
         {/* Left Period Title */}
-        <div className="flex-1 text-right pr-[24px] border-b border-[#222] pb-2 relative">
+        <div className="flex-1 text-right pr-[24px] border-b border-border pb-2 relative">
           <div 
             className={`inline-flex items-center gap-1.5 ${hasMultiplePeriods ? "cursor-pointer group" : ""}`}
             onClick={(e) => {
@@ -299,7 +304,7 @@ export default function Infographic({
               }
             }}
           >
-            <h3 className="font-display font-black text-white tracking-wider text-xs sm:text-sm uppercase group-hover:text-[#cfff3b] transition-colors">
+            <h3 className="font-display font-black text-white tracking-wider text-xs sm:text-sm uppercase group-hover:text-accent transition-colors">
               {periodA.label}
             </h3>
             {hasMultiplePeriods && (
@@ -316,7 +321,7 @@ export default function Infographic({
           {/* Left Dropdown */}
           {activeDropdown === "A" && (
             <div 
-              className="absolute right-[24px] top-full mt-2 bg-[#0c0c0e] border border-[#222] shadow-[0_12px_40px_rgba(0,0,0,0.95)] rounded-lg py-1 z-50 min-w-[150px] flex flex-col overflow-hidden text-right"
+              className="absolute right-[24px] top-full mt-2 bg-surface-popover border border-border shadow-[0_12px_40px_rgba(0,0,0,0.95)] rounded-lg py-1 z-50 min-w-[150px] flex flex-col overflow-hidden text-right"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="px-3 py-2 text-[9px] font-mono uppercase tracking-wider text-gray-500 border-b border-[#111] font-bold">
@@ -330,8 +335,8 @@ export default function Infographic({
                     onPeriodAChange?.(p.id);
                     setActiveDropdown(null);
                   }}
-                  className={`px-4 py-2.5 text-right text-xs uppercase font-mono font-bold tracking-wider hover:bg-[#cfff3b] hover:text-black transition-colors cursor-pointer ${
-                    p.id === periodA.id ? "text-[#cfff3b]" : "text-gray-300"
+                  className={`px-4 py-2.5 text-right text-xs uppercase font-mono font-bold tracking-wider hover:bg-accent hover:text-black transition-colors cursor-pointer ${
+                    p.id === periodA.id ? "text-accent" : "text-gray-300"
                   }`}
                 >
                   {p.label}
@@ -358,20 +363,34 @@ export default function Infographic({
               onChange={(e) => {
                 setSearchTerm(e.target.value);
                 setShowSuggestions(true);
+                setActiveSuggestionIndex(-1);
               }}
               onFocus={() => setShowSuggestions(true)}
               onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  const match = searchableCountries.find(
-                    (row) => row.name.toLowerCase().includes(searchTerm.toLowerCase())
+                if (e.key === "ArrowDown") {
+                  e.preventDefault();
+                  setActiveSuggestionIndex((prev) =>
+                    prev >= filteredSuggestions.length - 1 ? 0 : prev + 1
                   );
+                } else if (e.key === "ArrowUp") {
+                  e.preventDefault();
+                  setActiveSuggestionIndex((prev) =>
+                    prev <= 0 ? filteredSuggestions.length - 1 : prev - 1
+                  );
+                } else if (e.key === "Enter") {
+                  e.preventDefault();
+                  const match =
+                    activeSuggestionIndex >= 0
+                      ? filteredSuggestions[activeSuggestionIndex]
+                      : filteredSuggestions[0];
                   if (match) {
                     selectAndScrollCountry(match.id);
                     setShowSuggestions(false);
+                    setActiveSuggestionIndex(-1);
                   }
                 }
               }}
-              className="w-full bg-[#111] border border-[#222] text-xs text-white rounded-lg pl-9 pr-8 py-1.5 focus:outline-none focus:border-[#cfff3b] focus:ring-1 focus:ring-[#cfff3b] placeholder-gray-500 transition-all font-mono uppercase tracking-wider animate-fade-in"
+              className="w-full bg-surface-elevated border border-border text-xs text-white rounded-lg pl-9 pr-8 py-1.5 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent placeholder-gray-500 transition-all font-mono uppercase tracking-wider animate-fade-in"
             />
             {searchTerm && (
               <button
@@ -389,35 +408,34 @@ export default function Infographic({
 
             {/* Autocomplete Suggestions Dropdown */}
             {showSuggestions && searchTerm && (
-              <div className="absolute left-0 right-0 mt-1 max-h-60 overflow-y-auto bg-[#0c0c0e] border border-[#222] shadow-[0_12px_40px_rgba(0,0,0,0.95)] rounded-lg py-1 z-50 flex flex-col text-left">
-                {searchableCountries.filter((row) =>
-                  row.name.toLowerCase().includes(searchTerm.toLowerCase())
-                ).length > 0 ? (
-                  searchableCountries
-                    .filter((row) =>
-                      row.name.toLowerCase().includes(searchTerm.toLowerCase())
-                    )
-                    .map((row) => (
-                      <button
-                        key={`search-suggest-${row.id}`}
-                        type="button"
-                        onClick={() => {
-                          selectAndScrollCountry(row.id);
-                          setShowSuggestions(false);
-                        }}
-                        className="px-3 py-2 text-left text-[11px] uppercase font-mono font-bold tracking-wider text-gray-300 hover:bg-[#cfff3b] hover:text-black transition-colors cursor-pointer flex items-center gap-2"
-                      >
-                        {!failedFlags.has(row.code.toLowerCase()) && (
-                          <img
-                            src={`https://flagcdn.com/${row.code.toLowerCase()}.svg`}
-                            alt={row.name}
-                            className="w-4 h-2.5 object-cover rounded-sm border border-[#222]"
-                            referrerPolicy="no-referrer"
-                          />
-                        )}
-                        <span className="truncate">{row.name}</span>
-                      </button>
-                    ))
+              <div className="absolute left-0 right-0 mt-1 max-h-60 overflow-y-auto bg-surface-popover border border-border shadow-[0_12px_40px_rgba(0,0,0,0.95)] rounded-lg py-1 z-50 flex flex-col text-left">
+                {filteredSuggestions.length > 0 ? (
+                  filteredSuggestions.map((row, idx) => (
+                    <button
+                      key={`search-suggest-${row.id}`}
+                      type="button"
+                      onClick={() => {
+                        selectAndScrollCountry(row.id);
+                        setShowSuggestions(false);
+                        setActiveSuggestionIndex(-1);
+                      }}
+                      className={`px-3 py-2 text-left text-[11px] uppercase font-mono font-bold tracking-wider transition-colors cursor-pointer flex items-center gap-2 ${
+                        idx === activeSuggestionIndex
+                          ? "bg-accent text-black"
+                          : "text-gray-300 hover:bg-accent hover:text-black"
+                      }`}
+                    >
+                      {!failedFlags.has(row.code.toLowerCase()) && (
+                        <img
+                          src={`https://flagcdn.com/${row.code.toLowerCase()}.svg`}
+                          alt={row.name}
+                          className="w-4 h-2.5 object-cover border border-border"
+                          referrerPolicy="no-referrer"
+                        />
+                      )}
+                      <span className="truncate">{row.name}</span>
+                    </button>
+                  ))
                 ) : (
                   <div className="px-3 py-2 text-[10px] text-gray-500 font-mono uppercase">
                     No matching countries
@@ -429,7 +447,7 @@ export default function Infographic({
         </div>
 
         {/* Right Period Title */}
-        <div className="flex-1 text-left pl-[24px] border-b border-[#222] pb-2 relative">
+        <div className="flex-1 text-left pl-[24px] border-b border-border pb-2 relative">
           <div 
             className={`inline-flex items-center gap-1.5 ${hasMultiplePeriods ? "cursor-pointer group" : ""}`}
             onClick={(e) => {
@@ -439,7 +457,7 @@ export default function Infographic({
               }
             }}
           >
-            <h3 className="font-display font-black text-white tracking-wider text-xs sm:text-sm uppercase group-hover:text-[#cfff3b] transition-colors">
+            <h3 className="font-display font-black text-white tracking-wider text-xs sm:text-sm uppercase group-hover:text-accent transition-colors">
               {periodB.label}
             </h3>
             {hasMultiplePeriods && (
@@ -456,7 +474,7 @@ export default function Infographic({
           {/* Right Dropdown */}
           {activeDropdown === "B" && (
             <div 
-              className="absolute left-[24px] top-full mt-2 bg-[#0c0c0e] border border-[#222] shadow-[0_12px_40px_rgba(0,0,0,0.95)] rounded-lg py-1 z-50 min-w-[150px] flex flex-col overflow-hidden text-left"
+              className="absolute left-[24px] top-full mt-2 bg-surface-popover border border-border shadow-[0_12px_40px_rgba(0,0,0,0.95)] rounded-lg py-1 z-50 min-w-[150px] flex flex-col overflow-hidden text-left"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="px-3 py-2 text-[9px] font-mono uppercase tracking-wider text-gray-500 border-b border-[#111] font-bold">
@@ -470,8 +488,8 @@ export default function Infographic({
                     onPeriodBChange?.(p.id);
                     setActiveDropdown(null);
                   }}
-                  className={`px-4 py-2.5 text-left text-xs uppercase font-mono font-bold tracking-wider hover:bg-[#cfff3b] hover:text-black transition-colors cursor-pointer ${
-                    p.id === periodB.id ? "text-[#cfff3b]" : "text-gray-300"
+                  className={`px-4 py-2.5 text-left text-xs uppercase font-mono font-bold tracking-wider hover:bg-accent hover:text-black transition-colors cursor-pointer ${
+                    p.id === periodB.id ? "text-accent" : "text-gray-300"
                   }`}
                 >
                   {p.label}
@@ -595,7 +613,7 @@ export default function Infographic({
                   <path
                     d={d}
                     fill="none"
-                    stroke={(yA === null || yB === null) ? "transparent" : "#0c0c0c"}
+                    stroke={(yA === null || yB === null) ? "transparent" : "var(--color-surface)"}
                     strokeWidth={thickness + 2}
                     strokeLinecap="butt"
                   />
@@ -669,7 +687,7 @@ export default function Infographic({
                   {/* Flag inside perfectly clipped rounded rectangle with 3:2 aspect ratio centered at startX */}
                   {!failedFlags.has(row.code.toLowerCase()) && (
                     <div 
-                      className="h-8 aspect-[3/2] rounded overflow-hidden border border-[#222] shadow-[2px_2px_5px_rgba(0,0,0,0.7)] flex items-center justify-center shrink-0 bg-[#0c0c0c] absolute top-1/2 -translate-y-1/2 z-30 pointer-events-none"
+                      className="h-8 aspect-[3/2] rounded overflow-hidden border border-border shadow-[2px_2px_5px_rgba(0,0,0,0.7)] flex items-center justify-center shrink-0 bg-surface absolute top-1/2 -translate-y-1/2 z-30 pointer-events-none"
                       style={{ right: '-24px' }}
                     >
                       <img
@@ -685,7 +703,7 @@ export default function Infographic({
 
                   {/* Rank text placed directly over the ribbon, centered at startX + 32px */}
                   <div 
-                    className="absolute top-1/2 -translate-y-1/2 z-30 font-bold text-xs sm:text-sm text-left text-[#0c0c0c] w-8 pointer-events-none select-none transition-opacity duration-200"
+                    className="absolute top-1/2 -translate-y-1/2 z-30 font-bold text-xs sm:text-sm text-left text-surface w-8 pointer-events-none select-none transition-opacity duration-200"
                     style={{ 
                       right: '-72px',
                       opacity: isDimmed ? 0.3 : 1
@@ -743,7 +761,7 @@ export default function Infographic({
                 >
                   {/* Rank text placed directly over the ribbon, centered at endX - 32px */}
                   <div 
-                    className="absolute top-1/2 -translate-y-1/2 z-30 font-bold text-xs sm:text-sm text-right text-[#0c0c0c] w-8 pointer-events-none select-none transition-opacity duration-200"
+                    className="absolute top-1/2 -translate-y-1/2 z-30 font-bold text-xs sm:text-sm text-right text-surface w-8 pointer-events-none select-none transition-opacity duration-200"
                     style={{ 
                       left: '-72px',
                       opacity: isDimmed ? 0.3 : 1
@@ -755,7 +773,7 @@ export default function Infographic({
                   {/* Flag inside perfectly clipped rounded rectangle with 3:2 aspect ratio centered at endX */}
                   {!failedFlags.has(row.code.toLowerCase()) && (
                     <div 
-                      className="h-8 aspect-[3/2] rounded overflow-hidden border border-[#222] shadow-[2px_2px_5px_rgba(0,0,0,0.7)] flex items-center justify-center shrink-0 bg-[#0c0c0c] absolute top-1/2 -translate-y-1/2 z-30 pointer-events-none"
+                      className="h-8 aspect-[3/2] rounded overflow-hidden border border-border shadow-[2px_2px_5px_rgba(0,0,0,0.7)] flex items-center justify-center shrink-0 bg-surface absolute top-1/2 -translate-y-1/2 z-30 pointer-events-none"
                       style={{ left: '-24px' }}
                     >
                       <img
@@ -804,7 +822,7 @@ export default function Infographic({
       {hoveredCountryId && (
         <div 
           id="spotlight-footer"
-          className="fixed bottom-0 left-0 w-full bg-[#0c0c0c]/95 backdrop-blur-md border-t border-[#222] z-50 text-gray-300 shadow-[0_-10px_30px_rgba(0,0,0,0.8)] animate-slide-up"
+          className="fixed bottom-0 left-0 w-full bg-surface/95 backdrop-blur-md border-t border-border z-50 text-gray-300 shadow-[0_-10px_30px_rgba(0,0,0,0.8)] animate-slide-up"
           onClick={(e) => e.stopPropagation()} // Stop propagation so clicking inside does not unselect
         >
           <div className="w-full max-w-xl mx-auto px-4 py-4 flex items-center justify-between h-20">
@@ -822,7 +840,7 @@ export default function Infographic({
                 <div className="flex items-center w-full gap-4">
                   {/* Flag display inside rounded rectangle with 3:2 aspect ratio */}
                   {!failedFlags.has(country.code.toLowerCase()) && (
-                    <div className="h-12 aspect-[3/2] rounded-md overflow-hidden border border-[#222] shadow-[2px_2px_5px_rgba(0,0,0,0.7)] flex items-center justify-center shrink-0 bg-[#161618]">
+                    <div className="h-12 aspect-[3/2] rounded-md overflow-hidden border border-border shadow-[2px_2px_5px_rgba(0,0,0,0.7)] flex items-center justify-center shrink-0 bg-surface-hover">
                       <img 
                         src={`https://flagcdn.com/${country.code.toLowerCase()}.svg`}
                         alt={country.name}
@@ -861,7 +879,7 @@ export default function Infographic({
                           <span>Down {Math.abs(change)}</span>
                         </div>
                       ) : (
-                        <div className="flex items-center text-gray-400 font-bold bg-[#161618]/40 border border-[#222] py-1.5 px-3 rounded-lg text-xs gap-1">
+                        <div className="flex items-center text-gray-400 font-bold bg-surface-hover/40 border border-border py-1.5 px-3 rounded-lg text-xs gap-1">
                           <Minus size={14} />
                           <span>Unchanged</span>
                         </div>

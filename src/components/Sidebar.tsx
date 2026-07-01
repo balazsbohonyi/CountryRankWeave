@@ -56,14 +56,14 @@ export default function Sidebar({
       {/* Sidebar Container - 30-35% wider (from w-80 (320px) to w-[420px]) */}
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`fixed left-0 top-0 h-full w-[420px] max-w-[90vw] bg-[#0c0c0c]/95 border-r border-[#222] backdrop-blur-md z-50 text-slate-200 shadow-2xl transition-transform duration-300 ease-in-out flex flex-col ${
+        className={`fixed left-0 top-0 h-full w-[420px] max-w-[90vw] bg-surface/95 border-r border-border backdrop-blur-md z-50 text-slate-200 shadow-2xl transition-transform duration-300 ease-in-out flex flex-col ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         {/* Toggle Control Button attached to the right edge - Width reduced by ~27% (from w-11 (44px) to w-8 (32px)) */}
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="absolute right-[-32px] top-1/2 -translate-y-1/2 w-8 h-24 bg-[#0c0c0c] border-y border-r border-[#222] hover:border-gray-700 text-[#cfff3b] rounded-r-xl flex flex-col items-center justify-center gap-1 cursor-pointer transition-all hover:bg-[#161618] shadow-[4px_0_15px_rgba(0,0,0,0.5)] focus:outline-none"
+          className="absolute right-[-32px] top-1/2 -translate-y-1/2 w-8 h-24 bg-surface border-y border-r border-border hover:border-gray-700 text-accent rounded-r-xl flex flex-col items-center justify-center gap-1 cursor-pointer transition-all hover:bg-surface-hover shadow-[4px_0_15px_rgba(0,0,0,0.5)] focus:outline-none"
           title={isOpen ? "Close Customization Menu" : "Open Customization Menu"}
         >
           {isOpen ? (
@@ -79,9 +79,9 @@ export default function Sidebar({
         {/* Sidebar Content */}
         <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6 select-none">
           {/* Header */}
-          <div className="flex items-center justify-between pb-4 border-b border-[#222]">
+          <div className="flex items-center justify-between pb-4 border-b border-border">
             <div className="flex items-center gap-2">
-              <Sliders className="text-[#cfff3b] w-4 h-4" />
+              <Sliders className="text-accent w-4 h-4" />
               <h3 className="font-display font-black tracking-wider uppercase text-xs text-white">
                 Infographic Engine
               </h3>
@@ -92,8 +92,8 @@ export default function Sidebar({
               onClick={() => setShowSettings(!showSettings)}
               className={`p-1.5 rounded-md transition-all border cursor-pointer focus:outline-none flex items-center gap-1.5 ${
                 showSettings 
-                  ? "bg-[#cfff3b] text-slate-950 border-[#cfff3b] font-bold" 
-                  : "bg-[#111] text-gray-400 border-[#222] hover:text-white hover:border-gray-700"
+                  ? "bg-accent text-slate-950 border-accent font-bold" 
+                  : "bg-surface-elevated text-gray-400 border-border hover:text-white hover:border-gray-700"
               }`}
               title="Toggle Advanced Settings"
             >
@@ -106,9 +106,9 @@ export default function Sidebar({
 
           {/* Collapsible Settings Panel: Appears only when user clicks dedicated settings icon button */}
           {showSettings && (
-            <div className="bg-[#111] p-4 rounded-xl border border-[#222] flex flex-col gap-4 animate-fade-in">
+            <div className="bg-surface-elevated p-4 rounded-xl border border-border flex flex-col gap-4 animate-fade-in">
               <div className="flex items-center justify-between">
-                <span className="text-[9px] font-mono font-bold uppercase tracking-wider text-[#cfff3b]">
+                <span className="text-[9px] font-mono font-bold uppercase tracking-wider text-accent">
                   Control Console
                 </span>
                 <span className="text-[8px] text-gray-500 font-mono uppercase">
@@ -120,7 +120,7 @@ export default function Sidebar({
               <div className="flex flex-col gap-2">
                 <label className="text-[10px] font-mono font-bold tracking-widest text-gray-400 uppercase flex justify-between">
                   <span>Filter Top Countries</span>
-                  <span className="text-[#cfff3b] font-black">Top {topN}</span>
+                  <span className="text-accent font-black">Top {topN}</span>
                 </label>
                 <div className="flex items-center gap-3">
                   <input
@@ -130,7 +130,7 @@ export default function Sidebar({
                     step="1"
                     value={topN}
                     onChange={(e) => onTopNChange(parseInt(e.target.value, 10))}
-                    className="w-full accent-[#cfff3b] bg-gray-800 h-1.5 rounded-full cursor-pointer"
+                    className="w-full accent-accent bg-gray-800 h-1.5 rounded-full cursor-pointer"
                   />
                 </div>
                 <span className="text-xs text-gray-400 leading-relaxed">
@@ -139,7 +139,7 @@ export default function Sidebar({
               </div>
 
               {/* Non-Overlap Section */}
-              <div className="flex flex-col gap-2 pt-2 border-t border-[#222]">
+              <div className="flex flex-col gap-2 pt-2 border-t border-border">
                 <label className="text-[10px] font-mono font-bold tracking-widest text-gray-400 uppercase">
                   Non-Overlap Policy
                 </label>
@@ -149,8 +149,8 @@ export default function Sidebar({
                     onClick={() => onMissingPolicyChange("show-faded")}
                     className={`py-1.5 px-2 rounded text-[9px] font-bold tracking-wider uppercase border transition-all cursor-pointer ${
                       missingPolicy === "show-faded"
-                        ? "bg-[#cfff3b] text-slate-950 border-[#cfff3b]"
-                        : "bg-black text-gray-400 border-[#222] hover:border-gray-700 hover:text-white"
+                        ? "bg-accent text-slate-950 border-accent"
+                        : "bg-black text-gray-400 border-border hover:border-gray-700 hover:text-white"
                     }`}
                   >
                     Show Faded
@@ -160,8 +160,8 @@ export default function Sidebar({
                     onClick={() => onMissingPolicyChange("hide")}
                     className={`py-1.5 px-2 rounded text-[9px] font-bold tracking-wider uppercase border transition-all cursor-pointer ${
                       missingPolicy === "hide"
-                        ? "bg-[#cfff3b] text-slate-950 border-[#cfff3b]"
-                        : "bg-black text-gray-400 border-[#222] hover:border-gray-700 hover:text-white"
+                        ? "bg-accent text-slate-950 border-accent"
+                        : "bg-black text-gray-400 border-border hover:border-gray-700 hover:text-white"
                     }`}
                   >
                     Hide Missing
@@ -176,7 +176,7 @@ export default function Sidebar({
 
           {/* Section: Comparison Periods */}
           {dataset.meta.periods.length > 2 && (
-            <div className="flex flex-col gap-3 pb-5 border-b border-[#222]">
+            <div className="flex flex-col gap-3 pb-5 border-b border-border">
               <label className="text-[10px] font-mono font-bold tracking-widest text-gray-500 uppercase">
                 Comparison Periods
               </label>
@@ -186,10 +186,10 @@ export default function Sidebar({
                   <select
                     value={periodAId}
                     onChange={(e) => onPeriodAChange(e.target.value)}
-                    className="w-full bg-black/50 border border-[#222] hover:border-gray-700 text-xs text-white rounded-lg px-2 py-1.5 focus:outline-none focus:border-[#cfff3b] cursor-pointer"
+                    className="w-full bg-black/50 border border-border hover:border-gray-700 text-xs text-white rounded-lg px-2 py-1.5 focus:outline-none focus:border-accent cursor-pointer"
                   >
                     {dataset.meta.periods.map((p) => (
-                      <option key={p.id} value={p.id} className="bg-[#0c0c0c] text-white">
+                      <option key={p.id} value={p.id} className="bg-surface text-white">
                         {p.label}
                       </option>
                     ))}
@@ -200,10 +200,10 @@ export default function Sidebar({
                   <select
                     value={periodBId}
                     onChange={(e) => onPeriodBChange(e.target.value)}
-                    className="w-full bg-black/50 border border-[#222] hover:border-gray-700 text-xs text-white rounded-lg px-2 py-1.5 focus:outline-none focus:border-[#cfff3b] cursor-pointer"
+                    className="w-full bg-black/50 border border-border hover:border-gray-700 text-xs text-white rounded-lg px-2 py-1.5 focus:outline-none focus:border-accent cursor-pointer"
                   >
                     {dataset.meta.periods.map((p) => (
-                      <option key={p.id} value={p.id} className="bg-[#0c0c0c] text-white">
+                      <option key={p.id} value={p.id} className="bg-surface text-white">
                         {p.label}
                       </option>
                     ))}
@@ -227,15 +227,15 @@ export default function Sidebar({
                       onClick={() => onDatasetChange(d.id)}
                       className={`w-full text-left text-xs transition-colors cursor-pointer flex items-start gap-2.5 py-1 focus:outline-none ${
                         isActive
-                          ? "text-[#cfff3b] font-bold"
+                          ? "text-accent font-bold"
                           : "text-gray-400 hover:text-white font-medium"
                       }`}
                     >
                       {/* Interactive indicator bullet */}
                       <span className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 transition-transform ${
-                        isActive ? "bg-[#cfff3b] scale-125" : "bg-gray-600 group-hover:bg-gray-300"
+                        isActive ? "bg-accent scale-125" : "bg-gray-600 group-hover:bg-gray-300"
                       }`} />
-                      <span className={isActive ? "underline decoration-[#cfff3b]/30 underline-offset-4" : ""}>
+                      <span className={isActive ? "underline decoration-accent/30 underline-offset-4" : ""}>
                         {d.label}
                       </span>
                     </button>
@@ -246,10 +246,10 @@ export default function Sidebar({
           </div>
 
           {/* Export Action Button */}
-          <div className="mt-auto pt-6 border-t border-[#222]">
+          <div className="mt-auto pt-6 border-t border-border">
             <button
               onClick={handleExportData}
-              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-xs font-semibold bg-[#111] border border-[#222] hover:border-gray-700 text-gray-200 transition-all active:scale-95 hover:bg-white/5 cursor-pointer"
+              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-xs font-semibold bg-surface-elevated border border-border hover:border-gray-700 text-gray-200 transition-all active:scale-95 hover:bg-white/5 cursor-pointer"
             >
               <Download size={14} />
               <span>Export Active Dataset (JSON)</span>

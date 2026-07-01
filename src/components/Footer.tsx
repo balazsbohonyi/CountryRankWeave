@@ -48,7 +48,7 @@ export default function Footer({ dataset, topN, periodBId }: FooterProps) {
   return (
     <footer className="w-full max-w-4xl mx-auto mt-12 pb-16 px-4">
       {/* Signature branding strip mimicking the visual reference bottom bar */}
-      <div className="pt-6 border-t border-[#222] select-none flex flex-col gap-5 text-[10px] text-gray-500 font-mono tracking-wider relative">
+      <div className="pt-6 border-t border-border select-none flex flex-col gap-5 text-[10px] text-gray-500 font-mono tracking-wider relative">
         
         {/* Color legend on its own separate line */}
         <div className="flex justify-center items-center gap-6 relative">
@@ -62,8 +62,8 @@ export default function Footer({ dataset, topN, periodBId }: FooterProps) {
             }}
             className={`p-1 rounded-full border transition-all duration-150 cursor-pointer focus:outline-none flex items-center justify-center shrink-0 ${
               showPopover 
-                ? "bg-[#cfff3b] text-slate-950 border-[#cfff3b] font-bold" 
-                : "bg-[#111] text-gray-400 border-[#222] hover:text-white hover:border-gray-700"
+                ? "bg-accent text-slate-950 border-accent font-bold" 
+                : "bg-surface-elevated text-gray-400 border-border hover:text-white hover:border-gray-700"
             }`}
             title="How to Read the Ribbon Color Scale"
           >
@@ -88,7 +88,7 @@ export default function Footer({ dataset, topN, periodBId }: FooterProps) {
             <div 
               id="info-popover-container"
               ref={popoverRef}
-              className="absolute bottom-10 left-1/2 -translate-x-1/2 w-[92vw] max-w-lg p-5 rounded-xl border border-[#222] bg-[#0c0c0c] flex flex-col gap-3 select-none shadow-[0_10px_40px_rgba(0,0,0,0.9)] z-50 text-left cursor-default animate-fade-in"
+              className="absolute bottom-10 left-1/2 -translate-x-1/2 w-[92vw] max-w-lg p-5 rounded-xl border border-border bg-surface flex flex-col gap-3 select-none shadow-[0_10px_40px_rgba(0,0,0,0.9)] z-50 text-left cursor-default animate-fade-in"
               onClick={(e) => e.stopPropagation()}
             >
               <h4 className="text-[10px] uppercase font-display font-black text-gray-500 tracking-wider text-center">
@@ -107,7 +107,7 @@ export default function Footer({ dataset, topN, periodBId }: FooterProps) {
 
               {/* Destination-rank explanation note */}
               <div className="text-[11px] text-slate-400 text-center leading-normal max-w-sm mx-auto font-sans mt-1 normal-case font-normal">
-                📌 <span className="font-semibold text-slate-300">Destination-Rank Rule</span>: Ribbon color is determined strictly by a country's final standing in <strong className="text-[#cfff3b]">{periodBLabel}</strong>. 
+                📌 <span className="font-semibold text-slate-300">Destination-Rank Rule</span>: Ribbon color is determined strictly by a country's final standing in <strong className="text-accent">{periodBLabel}</strong>. 
                 Its previous year's ribbon maintains this color to track its movement cleanly.
               </div>
             </div>
