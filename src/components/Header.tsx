@@ -14,7 +14,8 @@ interface HeaderProps {
 
 export default function Header({ dataset, topN, periodBId }: HeaderProps) {
   const { meta } = dataset;
-  const activePeriodB = meta.periods.find((p) => p.id === periodBId) || meta.periods[1] || meta.periods[0];
+  const activePeriodB = meta.periods.find((p) => p.id === periodBId) ?? meta.periods[1] ?? meta.periods[0];
+  const periodBLabel = activePeriodB?.label ?? "Final Period";
 
   return (
     <header className="w-full max-w-4xl mx-auto text-center px-4 pt-10 pb-6 flex flex-col items-center">
@@ -30,7 +31,7 @@ export default function Header({ dataset, topN, periodBId }: HeaderProps) {
 
       {/* Title Suffix / Date indicator */}
       <div className="font-display tracking-widest font-bold text-gray-500 text-xs sm:text-sm uppercase mt-4 select-none">
-        COMPARING RANKINGS ACROSS THE YEARS • FINAL STANDING IN {activePeriodB?.label.toUpperCase() || "2025"}
+        COMPARING RANKINGS ACROSS THE YEARS • FINAL STANDING IN {periodBLabel.toUpperCase()}
       </div>
 
       {/* Custom Subtitle editorial-styled paragraph */}

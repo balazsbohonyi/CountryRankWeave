@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect, useRef } from "react";
-import { RankingDataset, RenderedRow } from "../types";
+import { CountryData, MissingPolicy, RankingDataset, RenderedRow, SortDirection } from "../types";
 import { getRankColor } from "../utils/colors";
 import { ChevronDown, Search, X } from "lucide-react";
 import {
@@ -23,10 +23,25 @@ import {
 import CountryFlag from "./CountryFlag";
 import RankChangeBadge from "./RankChangeBadge";
 
+function compareByValue(
+  a: CountryData,
+  b: CountryData,
+  periodId: string,
+  sortDirection: SortDirection
+): number {
+  const valA = a.values[periodId];
+  const valB = b.values[periodId];
+  if (valA == null || valB == null) return 0;
+  if (valA !== valB) {
+    return sortDirection === "asc" ? valA - valB : valB - valA;
+  }
+  return a.name.localeCompare(b.name);
+}
+
 interface InfographicProps {
   dataset: RankingDataset;
   topN: number;
-  missingPolicy: "hide" | "show-faded";
+  missingPolicy: MissingPolicy;
   hoveredCountryId: string | null;
   setHoveredCountryId: (id: string | null) => void;
   periodAId?: string;
@@ -125,29 +140,30 @@ export default function Infographic({
     }, 100);
   };
 
-  const periodA = meta.periods.find((p) => p.id === periodAId) || meta.periods[0];
-  const periodB = meta.periods.find((p) => p.id === periodBId) || meta.periods[1] || meta.periods[0];
+  const periodA = meta.periods.find((p) => p.id === periodAId) ?? meta.periods[0];
+  const periodB = meta.periods.find((p) => p.id === periodBId) ?? meta.periods[1] ?? meta.periods[0];
   const sortDirection = meta.sortDirection;
+
+  if (!periodA || !periodB) {
+    return (
+      <div className="relative w-full max-w-[1600px] mx-auto py-8 px-4 text-center text-gray-500 font-mono uppercase text-xs">
+        No comparison periods available for this dataset.
+      </div>
+    );
+  }
 
   const hasMultiplePeriods = meta.periods.length > 2;
   const idxA = meta.periods.findIndex((p) => p.id === periodA.id);
   const idxB = meta.periods.findIndex((p) => p.id === periodB.id);
-  const validPeriodsA = meta.periods.filter((p, index) => index < idxB);
-  const validPeriodsB = meta.periods.filter((p, index) => index > idxA);
+  const validPeriodsA = idxB >= 0 ? meta.periods.filter((p, index) => index < idxB) : [];
+  const validPeriodsB = idxA >= 0 ? meta.periods.filter((p, index) => index > idxA) : [];
 
   // 1. Process and compute ranks for Period A
   let countriesA = countries.filter((c) => c.values[periodA.id] !== null);
   if (missingPolicy === "hide") {
     countriesA = countriesA.filter((c) => c.values[periodB.id] !== null);
   }
-  const sortedA = [...countriesA].sort((a, b) => {
-    const valA = a.values[periodA.id] as number;
-    const valB = b.values[periodA.id] as number;
-    if (valA !== valB) {
-      return sortDirection === "asc" ? valA - valB : valB - valA;
-    }
-    return a.name.localeCompare(b.name);
-  });
+  const sortedA = [...countriesA].sort((a, b) => compareByValue(a, b, periodA.id, sortDirection));
   const listA: RenderedRow[] = sortedA.map((c, idx) => ({
     id: c.id,
     name: c.name,
@@ -161,14 +177,7 @@ export default function Infographic({
   if (missingPolicy === "hide") {
     countriesB = countriesB.filter((c) => c.values[periodA.id] !== null);
   }
-  const sortedB = [...countriesB].sort((a, b) => {
-    const valA = a.values[periodB.id] as number;
-    const valB = b.values[periodB.id] as number;
-    if (valA !== valB) {
-      return sortDirection === "asc" ? valA - valB : valB - valA;
-    }
-    return a.name.localeCompare(b.name);
-  });
+  const sortedB = [...countriesB].sort((a, b) => compareByValue(a, b, periodB.id, sortDirection));
   const listB: RenderedRow[] = sortedB.map((c, idx) => ({
     id: c.id,
     name: c.name,
@@ -264,10 +273,15 @@ export default function Infographic({
     if (!isSingle_a && isSingle_b) return 1;
     if (isSingle_a && isSingle_b) return 0;
 
-    const rankA_a = idxA_a! + 1;
-    const rankB_a = idxB_a! + 1;
-    const rankA_b = idxA_b! + 1;
-    const rankB_b = idxB_b! + 1;
+    // Both countries are present in both columns; indices are guaranteed here.
+    if (idxA_a === undefined || idxB_a === undefined || idxA_b === undefined || idxB_b === undefined) {
+      return 0;
+    }
+
+    const rankA_a = idxA_a + 1;
+    const rankB_a = idxB_a + 1;
+    const rankA_b = idxA_b + 1;
+    const rankB_b = idxB_b + 1;
 
     const abs_a = Math.abs(rankA_a - rankB_a);
     const abs_b = Math.abs(rankA_b - rankB_b);

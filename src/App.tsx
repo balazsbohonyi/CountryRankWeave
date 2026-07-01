@@ -5,6 +5,7 @@
 
 import { Analytics } from "@vercel/analytics/react"
 import { useState, useEffect } from "react";
+import { MissingPolicy, RankingDataset } from "./types";
 import { reputationDataset } from "./data/reputation";
 import { giniDataset } from "./data/gini";
 import { nobelDataset } from "./data/nobel";
@@ -14,7 +15,13 @@ import Infographic from "./components/Infographic";
 import Footer from "./components/Footer";
 import Sidebar from "./components/Sidebar";
 
-const AVAILABLE_DATASETS = [
+interface DatasetEntry {
+  id: string;
+  label: string;
+  data: RankingDataset;
+}
+
+const AVAILABLE_DATASETS: DatasetEntry[] = [
   { id: "life-expectancy", label: "Life Expectancy at Birth (2000–2024)", data: lifeExpectancyDataset },
   { id: "reputation-rankings", label: "Global Reputation Rankings (2024 vs 2025)", data: reputationDataset },
   { id: "gini-index", label: "Income Inequality Gini Index (2014 vs 2024)", data: giniDataset },
@@ -28,9 +35,7 @@ export default function App() {
 
   // Configuration states
   const [topN, setTopN] = useState(dataset.meta.topN);
-  const [missingPolicy, setMissingPolicy] = useState<"hide" | "show-faded">(
-    dataset.meta.missingPolicy as "hide" | "show-faded"
-  );
+  const [missingPolicy, setMissingPolicy] = useState<MissingPolicy>(dataset.meta.missingPolicy);
   const [hoveredCountryId, setHoveredCountryId] = useState<string | null>(null);
   const [periodAId, setPeriodAId] = useState(dataset.meta.periods[0]?.id || "");
   const [periodBId, setPeriodBId] = useState(dataset.meta.periods[1]?.id || dataset.meta.periods[0]?.id || "");
@@ -38,7 +43,7 @@ export default function App() {
   // Sync settings when dataset is swapped
   useEffect(() => {
     setTopN(dataset.meta.topN);
-    setMissingPolicy(dataset.meta.missingPolicy as "hide" | "show-faded");
+    setMissingPolicy(dataset.meta.missingPolicy);
     setHoveredCountryId(null);
     setPeriodAId(dataset.meta.periods[0]?.id || "");
     setPeriodBId(dataset.meta.periods[1]?.id || dataset.meta.periods[0]?.id || "");

@@ -1,13 +1,10 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
-interface RGB {
+type RGB = {
   r: number;
   g: number;
   b: number;
-}
+};
+
+type RGBTuple = [number, number, number];
 
 function parseRGB(rgbStr: string): RGB {
   const match = rgbStr.match(/\d+/g);
@@ -21,7 +18,7 @@ function parseRGB(rgbStr: string): RGB {
   };
 }
 
-export function interpolateColor(c1: number[], c2: number[], factor: number): number[] {
+export function interpolateColor(c1: RGBTuple, c2: RGBTuple, factor: number): RGBTuple {
   return [
     Math.round(c1[0] + (c2[0] - c1[0]) * factor),
     Math.round(c1[1] + (c2[1] - c1[1]) * factor),
@@ -40,7 +37,7 @@ export function getRankColor(rank: number, totalRanks: number): string {
   const t = (rank - 1) / (totalRanks - 1);
   
   // Custom premium color stops tuned for a dark slate background:
-  const stops = [
+  const stops: RGBTuple[] = [
     [46, 213, 115],   // Minty emerald green (#2ed573) - Rank 1
     [164, 224, 45],   // Vibrant lime/yellow-green (#a4e02d)
     [255, 217, 0],    // Warm sunny yellow (#ffd900)

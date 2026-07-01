@@ -20,8 +20,8 @@ const rankingData = {
     }>;
     topN: number;               // number of countries to include (e.g. 15, 30)
     sortDirection: "asc" | "desc";
-    missingPolicy: "show-faded" | "skip";
-    ribbonMode: "constant" | "varying"; // chart rendering hint, keep value
+    missingPolicy: "hide" | "show-faded";
+    ribbonMode: "constant" | "value-based" | "varying"; // chart rendering hint, keep value
     sourceNote: string;         // brief source description and link if known
     datasetId: string;          // machine id for dataset
     datasetLabel: string;       // human-friendly dataset label
@@ -55,9 +55,9 @@ IMPORTANT RULES
 
 - Missing data:
   - If a country has no data for a period but appears in others, include it with `null` for missing periods.
-  - Respect `meta.missingPolicy`:  
-    - `"show-faded"` → include missing values as `null`.  
-    - `"skip"` → drop countries without data for the latest period.
+  - Respect `meta.missingPolicy`:
+    - `"show-faded"` → include missing values as `null` and render entering/exiting countries faded.
+    - `"hide"` → drop countries without data for the selected comparison period.
 
 - Output:
   - Return ONLY the `const rankingData = { ... };` block, valid JavaScript/TypeScript, inside a Markdown block.

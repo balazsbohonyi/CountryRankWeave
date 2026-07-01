@@ -3,6 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+export type SortDirection = "asc" | "desc";
+export type MissingPolicy = "hide" | "show-faded";
+export type RibbonMode = "constant" | "value-based" | "varying";
+
 export interface Period {
   id: string;
   label: string;
@@ -15,9 +19,9 @@ export interface DatasetMeta {
   unit: string;
   periods: Period[];
   topN: number;
-  sortDirection: "asc" | "desc";
-  missingPolicy: "hide" | "show-faded";
-  ribbonMode: "constant" | "value-based" | "varying";
+  sortDirection: SortDirection;
+  missingPolicy: MissingPolicy;
+  ribbonMode: RibbonMode;
   sourceNote: string;
   datasetId: string;
   datasetLabel: string;

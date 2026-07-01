@@ -20,8 +20,8 @@ export default function Footer({ dataset, topN, periodBId }: FooterProps) {
   const [showPopover, setShowPopover] = useState(false);
   const popoverRef = useRef<HTMLDivElement>(null);
 
-  const activePeriodB = meta.periods.find((p) => p.id === periodBId) || meta.periods[1] || meta.periods[0];
-  const periodBLabel = activePeriodB?.label || "Final Period";
+  const activePeriodB = meta.periods.find((p) => p.id === periodBId) ?? meta.periods[1] ?? meta.periods[0];
+  const periodBLabel = activePeriodB?.label ?? "Final Period";
 
   // Create steps for the color gradient legend
   const legendSteps = 6;
