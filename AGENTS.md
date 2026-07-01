@@ -15,13 +15,12 @@ The chart engine is fully data-driven: the same `RankingDataset` schema controls
 ## Tech Stack
 
 - **Framework:** React 19 (function components + hooks)
-- **Language:** TypeScript 5.8
+- **Language:** TypeScript 5.8 (strict mode enabled)
 - **Build tool:** Vite 6
 - **Styling:** Tailwind CSS v4 via `@tailwindcss/vite`
 - **Icons:** `lucide-react`
 - **Flags:** Loaded dynamically from `https://flagcdn.com/{code}.svg`
-- **Animation:** `motion` (installed, used sparingly)
-- **AI SDK:** `@google/genai` (installed but not used in the current renderer)
+- **Analytics:** `@vercel/analytics`
 
 ---
 
@@ -37,12 +36,14 @@ D:\develop\projects\CountryRankWeave
 ├── AGENTS.md                  # This file
 ├── docs/
 │   ├── Countries-With-the-Best-Reputations.png  # Original reference image
+│   ├── codebase-quality-assessment.md  # Maintainability audit and recommendations
 │   └── dataset-prompt.md      # Prompt/schema used to research and shape new datasets
 └── src/
     ├── main.tsx               # React root render
     ├── App.tsx                # App shell, dataset registry, state orchestration
-    ├── index.css              # Tailwind import, custom fonts, chalkboard background
-    ├── types.ts               # Core TypeScript interfaces
+    ├── index.css              # Tailwind import, custom fonts, design tokens, chalkboard background
+    ├── types.ts               # Core TypeScript interfaces and exported type aliases
+    ├── config.ts              # Layout geometry, responsive breakpoints, color tokens
     ├── utils/colors.ts        # Rank-to-color interpolation and dim helper
     ├── data/
     │   ├── reputation.ts      # 2024–2025 Reputation Lab rankings
@@ -53,7 +54,9 @@ D:\develop\projects\CountryRankWeave
         ├── Header.tsx         # Editorial title, subtitle, period label
         ├── Infographic.tsx    # Main chart: lists, SVG ribbons, search, spotlight footer
         ├── Sidebar.tsx        # Slide-out dataset/settings/export panel
-        └── Footer.tsx         # Color legend, source note, info popover
+        ├── Footer.tsx         # Color legend, source note, info popover
+        ├── CountryFlag.tsx    # Reusable flag image with failure handling
+        └── RankChangeBadge.tsx # Reusable rank-movement indicator
 ```
 
 ---
@@ -63,6 +66,10 @@ D:\develop\projects\CountryRankWeave
 Everything flows from `src/types.ts`:
 
 ```ts
+type SortDirection = "asc" | "desc";
+type MissingPolicy = "hide" | "show-faded";
+type RibbonMode = "constant" | "value-based" | "varying";
+
 interface RankingDataset {
   meta: DatasetMeta;
   countries: CountryData[];
@@ -75,9 +82,9 @@ interface DatasetMeta {
   unit: string;
   periods: Period[];          // e.g. [{id:"2024", label:"2024 Rank"}, ...]
   topN: number;               // max rows to render (also max for slider)
-  sortDirection: "asc" | "desc";
-  missingPolicy: "hide" | "show-faded";
-  ribbonMode: "constant" | "value-based" | "varying";
+  sortDirection: SortDirection;
+  missingPolicy: MissingPolicy;
+  ribbonMode: RibbonMode;
   sourceNote: string;
   datasetId: string;
   datasetLabel: string;
@@ -107,7 +114,7 @@ npm install          # Install dependencies
 npm run dev          # Dev server on http://localhost:3000
 npm run build        # Production build into dist/
 npm run preview      # Preview production build
-npm run lint         # tsc --noEmit (type check only)
+npm run lint         # tsc --noEmit (strict type check only)
 npm run clean        # Remove dist and server.js
 ```
 
@@ -134,8 +141,11 @@ For the exact schema, source requirements, and ranking/sorting rules, see `docs/
 - **App.tsx:** Owns `activeDatasetId`, `topN`, `missingPolicy`, `periodAId`, `periodBId`, and `hoveredCountryId`. Syncs all settings when the dataset changes.
 - **Sidebar.tsx:** Provides dataset selection, Top-N slider, missing-policy toggle, period dropdowns (when >2 periods), and JSON export. Uses internal state for open/closed and settings visibility.
 - **Header.tsx:** Renders the editorial title, dataset label, subtitle, and active final-period indicator.
-- **Infographic.tsx:** The heaviest component. Computes ranks for both selected periods, positions rows, draws SVG ribbons with Bézier curves, handles hover/click/search, and renders the fixed spotlight footer.
+- **Infographic.tsx:** The heaviest component. Computes ranks for both selected periods, positions rows, draws SVG ribbons with Bézier curves, handles hover/click/search (including arrow-key navigation in the suggestions dropdown), and renders the fixed spotlight footer. Imports layout constants from `config.ts` and delegates flag/badge rendering to `CountryFlag` and `RankChangeBadge`.
 - **Footer.tsx:** Renders the color-legend strip, source note, and the info popover explaining the destination-rank color rule.
+- **CountryFlag.tsx:** Reusable flag image with failure handling and size variants (`column`, `spotlight`).
+- **RankChangeBadge.tsx:** Reusable rank-movement indicator with `inline` and `spotlight` variants.
+- **config.ts:** Centralizes layout geometry, responsive breakpoints, and color tokens used across components.
 - **colors.ts:** Maps a rank (1 to N) to a continuous palette (emerald → lime → yellow → orange → red → magenta).
 
 ---
@@ -150,13 +160,17 @@ For the exact schema, source requirements, and ranking/sorting rules, see `docs/
 - **SVG geometry is ResizeObserver-driven:** `Infographic.tsx` measures its container and recalculates middle spacing and Bézier control points responsively.
 - **Flags are loaded from FlagCDN:** A failed flag URL is tracked in local state and the image is hidden. Non-standard codes may fail; this is expected and graceful.
 - **Click-outside behavior:** Clicking the page background clears the active country selection. The sidebar and spotlight footer stop propagation.
+- **Design tokens are centralized:** Layout geometry (row height, ribbon thickness, breakpoints) lives in `src/config.ts`; surface/border/accent colors live in CSS custom properties (`--color-*`) and Tailwind utilities (`accent`, `surface`, `border`, etc.) in `src/index.css`.
+- **Reusable presentational pieces:** `CountryFlag` and `RankChangeBadge` encapsulate previously duplicated flag/badge markup from `Infographic.tsx`.
+- **Search keyboard navigation:** The suggestions dropdown supports `ArrowUp`/`ArrowDown` highlighting and `Enter` to select.
+- **TypeScript strict mode is enabled:** `tsconfig.json` sets `"strict": true`, so new code should satisfy strict null-checking and implicit-any rules.
 
 ---
 
 ## Styling Notes
 
 - Tailwind CSS v4 is imported in `src/index.css` with `@import "tailwindcss";`.
-- Custom theme tokens (`--font-serif`, `--font-sans`, `--font-mono`, `--font-display`) are declared in `@theme`.
+- Custom theme tokens (`--font-serif`, `--font-sans`, `--font-mono`, `--font-display`) and color tokens (`--color-accent`, `--color-surface`, `--color-surface-elevated`, `--color-surface-popover`, `--color-surface-hover`, `--color-border`) are declared in `@theme`.
 - The dark "chalkboard" aesthetic uses the `.bg-chalkboard` utility defined in `index.css`.
 - Accent color is `#cfff3b` (lime-green) used for active states, highlights, and the chart's top-rank end of the scale.
 
@@ -165,7 +179,7 @@ For the exact schema, source requirements, and ranking/sorting rules, see `docs/
 ## Build and Deployment
 
 - Vite builds to `dist/`.
-- No backend is required for the chart renderer. `express` and `@google/genai` are installed in `package.json` but are not part of the current client-only rendering path.
+- The chart renderer is client-only; no backend is required.
 - The `clean` script uses `rm -rf` and is intended for Unix-like shells; on Windows it may need adjustment if used.
 
 ---

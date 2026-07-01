@@ -39,9 +39,9 @@ Adding more datasets is intentionally straightforward — the engine is data-dri
 
 - **Switch datasets** from the slide-out sidebar to explore different global metrics.
 - **Select any country** by clicking its row or ribbon — the rest of the chart dims and a detail panel slides in.
-- **Search** for a country by name to jump straight to its position.
+- **Search** for a country by name (with arrow-key navigation) to jump straight to its position.
 - **Filter Top N** with a slider to focus on the top 5, 10, 30, or the full leaderboard.
-- **Pick comparison periods** (where a dataset has more than two) using the dropdowns in the sidebar.
+- **Pick comparison periods** (where a dataset has more than two) from the chart header or the sidebar.
 - **Control missing data**: show faded entries for countries that enter or exit the ranking, or hide them entirely.
 - **Export** the active dataset as JSON directly from the sidebar.
 
