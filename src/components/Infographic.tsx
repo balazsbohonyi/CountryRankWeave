@@ -45,17 +45,14 @@ export default function Infographic({
     setFailedFlags(new Set());
   }, [dataset]);
 
-  // Synchronize searchTerm with hoveredCountryId and handle unselecting clearing
+  // Clear search field when a country is selected (click or search), and when unselected
   useEffect(() => {
     if (hoveredCountryId === null) {
       setSearchTerm("");
     } else {
-      const selected = countries.find((c) => c.id === hoveredCountryId);
-      if (selected) {
-        setSearchTerm(selected.name);
-      }
+      setSearchTerm("");
     }
-  }, [hoveredCountryId, countries]);
+  }, [hoveredCountryId]);
 
   // Close active dropdown or search suggestions on clicking outside
   useEffect(() => {
