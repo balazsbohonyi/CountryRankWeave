@@ -6,7 +6,22 @@
 import React, { useState, useEffect, useRef } from "react";
 import { RankingDataset, RenderedRow } from "../types";
 import { getRankColor } from "../utils/colors";
-import { ArrowUp, ArrowDown, Minus, HelpCircle, ChevronDown, Search, X } from "lucide-react";
+import { ChevronDown, Search, X } from "lucide-react";
+import {
+  ROW_HEIGHT,
+  RIBBON_THICKNESS,
+  getMiddleWidth,
+  FLAG_OFFSET,
+  RANK_OFFSET,
+  SPOTLIGHT_FOOTER_HEIGHT,
+  MIN_FLAT_LENGTH,
+  FLAT_LENGTH_RATIO,
+  CURVE_CONTROL_OFFSET_1,
+  CURVE_CONTROL_OFFSET_2,
+  DROPDOWN_DIVIDER_COLOR,
+} from "../config";
+import CountryFlag from "./CountryFlag";
+import RankChangeBadge from "./RankChangeBadge";
 
 interface InfographicProps {
   dataset: RankingDataset;
@@ -198,7 +213,7 @@ export default function Infographic({
   );
 
   const totalRows = Math.max(renderedListA.length, renderedListB.length);
-  const rowHeight = 44; // taller rows for solid design
+  const rowHeight = ROW_HEIGHT;
   const svgHeight = totalRows * rowHeight;
 
   // Index maps for geometry drawing
@@ -206,21 +221,10 @@ export default function Infographic({
   const indexMapB = new Map(renderedListB.map((item, idx) => [item.id, idx]));
 
   // Fixed thickness independent of the number of countries to prevent visual discrepancy across datasets
-  const thickness = 32;
+  const thickness = RIBBON_THICKNESS;
 
-  // Compute responsive middle spacer column width (increased by 50%+)
-  let middleWidth = 320; // Default
-  if (dimensions.width >= 1536) {
-    middleWidth = 980; // 2xl (spacious elegant look)
-  } else if (dimensions.width >= 1280) {
-    middleWidth = 840; // xl (spacious elegant look)
-  } else if (dimensions.width >= 1024) {
-    middleWidth = 680; // lg (spacious elegant look)
-  } else if (dimensions.width >= 768) {
-    middleWidth = 520; // md
-  } else if (dimensions.width >= 640) {
-    middleWidth = 420; // sm
-  }
+  // Compute responsive middle spacer column width
+  const middleWidth = getMiddleWidth(dimensions.width);
 
   // Left column width matches remaining flex-1 space precisely
   const wA = (dimensions.width - middleWidth) / 2;
@@ -228,12 +232,12 @@ export default function Infographic({
   const endX = wA + middleWidth;
   const ribbonStartX = startX + 20;
   const ribbonEndX = endX - 20;
-  const flatLength = Math.max(90, middleWidth * 0.10);
+  const flatLength = Math.max(MIN_FLAT_LENGTH, middleWidth * FLAT_LENGTH_RATIO);
   const xStartCurve = startX + flatLength;
   const xEndCurve = endX - flatLength;
   const curveWidth = middleWidth - 2 * flatLength;
-  const cp1x = xStartCurve + curveWidth * 0.45;
-  const cp2x = xStartCurve + curveWidth * 0.55;
+  const cp1x = xStartCurve + curveWidth * CURVE_CONTROL_OFFSET_1;
+  const cp2x = xStartCurve + curveWidth * CURVE_CONTROL_OFFSET_2;
 
   // Unique list of countries featured in either Column A or Column B
   const rawFeaturedIds = Array.from(new Set([
@@ -321,7 +325,7 @@ export default function Infographic({
               className="absolute right-[24px] top-full mt-2 bg-surface-popover border border-border shadow-[0_12px_40px_rgba(0,0,0,0.95)] rounded-lg py-1 z-50 min-w-[150px] flex flex-col overflow-hidden text-right"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="px-3 py-2 text-[9px] font-mono uppercase tracking-wider text-gray-500 border-b border-[#111] font-bold">
+              <div className="px-3 py-2 text-[9px] font-mono uppercase tracking-wider text-gray-500 border-b font-bold" style={{ borderBottomColor: DROPDOWN_DIVIDER_COLOR }}>
                 START PERIOD
               </div>
               {validPeriodsA.map((p) => (
@@ -474,7 +478,7 @@ export default function Infographic({
               className="absolute left-[24px] top-full mt-2 bg-surface-popover border border-border shadow-[0_12px_40px_rgba(0,0,0,0.95)] rounded-lg py-1 z-50 min-w-[150px] flex flex-col overflow-hidden text-left"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="px-3 py-2 text-[9px] font-mono uppercase tracking-wider text-gray-500 border-b border-[#111] font-bold">
+              <div className="px-3 py-2 text-[9px] font-mono uppercase tracking-wider text-gray-500 border-b font-bold" style={{ borderBottomColor: DROPDOWN_DIVIDER_COLOR }}>
                 END PERIOD
               </div>
               {validPeriodsB.map((p) => (
@@ -682,27 +686,22 @@ export default function Infographic({
                   </span>
 
                   {/* Flag inside perfectly clipped rounded rectangle with 3:2 aspect ratio centered at startX */}
-                  {!failedFlags.has(row.code.toLowerCase()) && (
-                    <div 
-                      className="h-8 aspect-[3/2] rounded overflow-hidden border border-border shadow-[2px_2px_5px_rgba(0,0,0,0.7)] flex items-center justify-center shrink-0 bg-surface absolute top-1/2 -translate-y-1/2 z-30 pointer-events-none"
-                      style={{ right: '-24px' }}
-                    >
-                      <img
-                        src={`https://flagcdn.com/${row.code.toLowerCase()}.svg`}
-                        alt={row.name}
-                        className="w-full h-full object-cover transition-opacity duration-200"
-                        style={{ opacity: isDimmed ? 0.25 : 1 }}
-                        referrerPolicy="no-referrer"
-                        onError={() => handleImageError(row.code.toLowerCase())}
-                      />
-                    </div>
-                  )}
+                  <CountryFlag
+                    code={row.code}
+                    name={row.name}
+                    failedFlags={failedFlags}
+                    onError={handleImageError}
+                    size="column"
+                    dimmed={isDimmed}
+                    className="absolute top-1/2 -translate-y-1/2 z-30"
+                    style={{ right: `-${FLAG_OFFSET}px` }}
+                  />
 
                   {/* Rank text placed directly over the ribbon, centered at startX + 32px */}
-                  <div 
+                  <div
                     className="absolute top-1/2 -translate-y-1/2 z-30 font-bold text-xs sm:text-sm text-left text-surface w-8 pointer-events-none select-none transition-opacity duration-200"
-                    style={{ 
-                      right: '-72px',
+                    style={{
+                      right: `-${RANK_OFFSET}px`,
                       opacity: isDimmed ? 0.3 : 1
                     }}
                   >
@@ -757,10 +756,10 @@ export default function Infographic({
                   }}
                 >
                   {/* Rank text placed directly over the ribbon, centered at endX - 32px */}
-                  <div 
+                  <div
                     className="absolute top-1/2 -translate-y-1/2 z-30 font-bold text-xs sm:text-sm text-right text-surface w-8 pointer-events-none select-none transition-opacity duration-200"
-                    style={{ 
-                      left: '-72px',
+                    style={{
+                      left: `-${RANK_OFFSET}px`,
                       opacity: isDimmed ? 0.3 : 1
                     }}
                   >
@@ -768,21 +767,16 @@ export default function Infographic({
                   </div>
 
                   {/* Flag inside perfectly clipped rounded rectangle with 3:2 aspect ratio centered at endX */}
-                  {!failedFlags.has(row.code.toLowerCase()) && (
-                    <div 
-                      className="h-8 aspect-[3/2] rounded overflow-hidden border border-border shadow-[2px_2px_5px_rgba(0,0,0,0.7)] flex items-center justify-center shrink-0 bg-surface absolute top-1/2 -translate-y-1/2 z-30 pointer-events-none"
-                      style={{ left: '-24px' }}
-                    >
-                      <img
-                        src={`https://flagcdn.com/${row.code.toLowerCase()}.svg`}
-                        alt={row.name}
-                        className="w-full h-full object-cover transition-opacity duration-200"
-                        style={{ opacity: isDimmed ? 0.25 : 1 }}
-                        referrerPolicy="no-referrer"
-                        onError={() => handleImageError(row.code.toLowerCase())}
-                      />
-                    </div>
-                  )}
+                  <CountryFlag
+                    code={row.code}
+                    name={row.name}
+                    failedFlags={failedFlags}
+                    onError={handleImageError}
+                    size="column"
+                    dimmed={isDimmed}
+                    className="absolute top-1/2 -translate-y-1/2 z-30"
+                    style={{ left: `-${FLAG_OFFSET}px` }}
+                  />
 
                   {/* Country Name along with Change Indicator Badge */}
                   <div 
@@ -795,17 +789,7 @@ export default function Infographic({
                       {row.name}
                     </span>
                     {rankChange !== null && rankChange !== 0 && (
-                      <div className="flex items-center justify-center pointer-events-none select-none shrink-0">
-                        {rankChange > 0 ? (
-                          <span className="text-[10px] font-bold text-emerald-400 flex items-center justify-center bg-[#102a1d]/95 border border-[#1b432f] rounded font-mono shrink-0 shadow-md w-8 h-5 text-center">
-                            +{rankChange}
-                          </span>
-                        ) : (
-                          <span className="text-[10px] font-bold text-rose-400 flex items-center justify-center bg-[#3b131c]/95 border border-[#5c1c28] rounded font-mono shrink-0 shadow-md w-8 h-5 text-center">
-                            -{Math.abs(rankChange)}
-                          </span>
-                        )}
-                      </div>
+                      <RankChangeBadge change={rankChange} variant="inline" />
                     )}
                   </div>
                 </div>
@@ -822,7 +806,7 @@ export default function Infographic({
           className="fixed bottom-0 left-0 w-full bg-surface/95 backdrop-blur-md border-t border-border z-50 text-gray-300 shadow-[0_-10px_30px_rgba(0,0,0,0.8)] animate-slide-up"
           onClick={(e) => e.stopPropagation()} // Stop propagation so clicking inside does not unselect
         >
-          <div className="w-full max-w-xl mx-auto px-4 py-4 flex items-center justify-between h-20">
+          <div className="w-full max-w-xl mx-auto px-4 py-4 flex items-center justify-between" style={{ height: SPOTLIGHT_FOOTER_HEIGHT }}>
             {(() => {
               const country = countries.find((c) => c.id === hoveredCountryId);
               const rowA = renderedListA.find((r) => r.id === hoveredCountryId);
@@ -836,17 +820,13 @@ export default function Infographic({
               return (
                 <div className="flex items-center w-full gap-4">
                   {/* Flag display inside rounded rectangle with 3:2 aspect ratio */}
-                  {!failedFlags.has(country.code.toLowerCase()) && (
-                    <div className="h-12 aspect-[3/2] rounded-md overflow-hidden border border-border shadow-[2px_2px_5px_rgba(0,0,0,0.7)] flex items-center justify-center shrink-0 bg-surface-hover">
-                      <img 
-                        src={`https://flagcdn.com/${country.code.toLowerCase()}.svg`}
-                        alt={country.name}
-                        className="w-full h-full object-cover"
-                        referrerPolicy="no-referrer"
-                        onError={() => handleImageError(country.code.toLowerCase())}
-                      />
-                    </div>
-                  )}
+                  <CountryFlag
+                    code={country.code}
+                    name={country.name}
+                    failedFlags={failedFlags}
+                    onError={handleImageError}
+                    size="spotlight"
+                  />
                   <div className="flex-1 min-w-0">
                     <h4 className="text-white font-bold text-base leading-tight truncate uppercase tracking-wider">{country.name}</h4>
                     <div className="text-[11px] text-gray-400 mt-1 flex flex-wrap gap-x-3 gap-y-1 font-mono">
@@ -864,28 +844,11 @@ export default function Infographic({
                   </div>
 
                   <div className="text-right shrink-0">
-                    {change !== null ? (
-                      change > 0 ? (
-                        <div className="flex items-center text-emerald-400 font-bold bg-[#102a1d]/40 border border-[#1b432f]/50 py-1.5 px-3 rounded-lg text-xs gap-1">
-                          <ArrowUp size={14} strokeWidth={2.5} />
-                          <span>Up {change}</span>
-                        </div>
-                      ) : change < 0 ? (
-                        <div className="flex items-center text-rose-400 font-bold bg-[#3b131c]/40 border border-[#5c1c28]/50 py-1.5 px-3 rounded-lg text-xs gap-1">
-                          <ArrowDown size={14} strokeWidth={2.5} />
-                          <span>Down {Math.abs(change)}</span>
-                        </div>
-                      ) : (
-                        <div className="flex items-center text-gray-400 font-bold bg-surface-hover/40 border border-border py-1.5 px-3 rounded-lg text-xs gap-1">
-                          <Minus size={14} />
-                          <span>Unchanged</span>
-                        </div>
-                      )
-                    ) : (
-                      <span className="text-xs text-gray-500 font-mono italic">
-                        {rowA ? "Exited top N" : "New entry"}
-                      </span>
-                    )}
+                    <RankChangeBadge
+                      change={change}
+                      variant="spotlight"
+                      exitedLabel={rowA ? "Exited top N" : "New entry"}
+                    />
                   </div>
                 </div>
               );

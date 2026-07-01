@@ -6,6 +6,7 @@
 import { useState } from "react";
 import { Sliders, Download, ChevronRight, ChevronLeft, Settings } from "lucide-react";
 import { RankingDataset } from "../types";
+import { SIDEBAR_WIDTH, SIDEBAR_TOGGLE_WIDTH } from "../config";
 
 interface SidebarProps {
   dataset: RankingDataset;
@@ -56,14 +57,16 @@ export default function Sidebar({
       {/* Sidebar Container - 30-35% wider (from w-80 (320px) to w-[420px]) */}
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`fixed left-0 top-0 h-full w-[420px] max-w-[90vw] bg-surface/95 border-r border-border backdrop-blur-md z-50 text-slate-200 shadow-2xl transition-transform duration-300 ease-in-out flex flex-col ${
+        className={`fixed left-0 top-0 h-full max-w-[90vw] bg-surface/95 border-r border-border backdrop-blur-md z-50 text-slate-200 shadow-2xl transition-transform duration-300 ease-in-out flex flex-col ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
+        style={{ width: SIDEBAR_WIDTH }}
       >
         {/* Toggle Control Button attached to the right edge - Width reduced by ~27% (from w-11 (44px) to w-8 (32px)) */}
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="absolute right-[-32px] top-1/2 -translate-y-1/2 w-8 h-24 bg-surface border-y border-r border-border hover:border-gray-700 text-accent rounded-r-xl flex flex-col items-center justify-center gap-1 cursor-pointer transition-all hover:bg-surface-hover shadow-[4px_0_15px_rgba(0,0,0,0.5)] focus:outline-none"
+          className="absolute top-1/2 -translate-y-1/2 w-8 h-24 bg-surface border-y border-r border-border hover:border-gray-700 text-accent rounded-r-xl flex flex-col items-center justify-center gap-1 cursor-pointer transition-all hover:bg-surface-hover shadow-[4px_0_15px_rgba(0,0,0,0.5)] focus:outline-none"
+          style={{ right: -SIDEBAR_TOGGLE_WIDTH }}
           title={isOpen ? "Close Customization Menu" : "Open Customization Menu"}
         >
           {isOpen ? (

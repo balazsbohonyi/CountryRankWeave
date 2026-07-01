@@ -7,6 +7,7 @@ import { useState, useEffect, useRef } from "react";
 import { Info } from "lucide-react";
 import { RankingDataset } from "../types";
 import { getRankColor } from "../utils/colors";
+import { LEGEND_COLORS } from "../config";
 
 interface FooterProps {
   dataset: RankingDataset;
@@ -71,15 +72,15 @@ export default function Footer({ dataset, topN, periodBId }: FooterProps) {
           </button>
 
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-[#4ade80]" />
+            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: LEGEND_COLORS.top }} />
             <span>TOP standing</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-[#fb923c]" />
+            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: LEGEND_COLORS.mid }} />
             <span>MID tier</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-[#f472b6]" />
+            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: LEGEND_COLORS.lower }} />
             <span>LOWER tier</span>
           </div>
 
